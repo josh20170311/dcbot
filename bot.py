@@ -15,24 +15,34 @@ client = discord.Client()
 
 @client.event
 async def on_ready():
-    print("on ready")
+	print("on ready")
 
 @bot.command(name = '消毒')
 async def Test(ctx):
-    await ctx.send('<:disinfection:845207148559335435>')
-    
+	await ctx.send('<:disinfection:845207148559335435>')
+
+@bot.command(name = "hi_bot")
+async def hi(ctx):
+	await ctx.send("hi")
+
+@bot.command(name = "bot_exit")
+async def bot_exit(ctx):
+	await ctx.send("exit")
+	print("exit")
+	exit(0)
+	
 @bot.command(name = '確診')
 async def infected(ctx):
-    url = 'https://covid19dashboard.cdc.gov.tw/dash3'
-    html = requests.get(url)
-    sp = BeautifulSoup(html.text, 'html5lib')
-    site_json = json.loads(sp.text)
-    embed = discord.Embed(title = 'COVID-19', url = 'https://www.cdc.gov.tw/', color = 0xFF0000)
-    keys = list(site_json['0'].keys())
-    values = list(site_json['0'].values())
-    for i in range(len(keys)):
-        embed.add_field(name = keys[i], value = values[i], inline = False)
-    await ctx.send(embed = embed)
+	url = 'https://covid19dashboard.cdc.gov.tw/dash3'
+	html = requests.get(url)
+	sp = BeautifulSoup(html.text, 'html5lib')
+	site_json = json.loads(sp.text)
+	embed = discord.Embed(title = 'COVID-19', url = 'https://www.cdc.gov.tw/', color = 0xFF0000)
+	keys = list(site_json['0'].keys())
+	values = list(site_json['0'].values())
+	for i in range(len(keys)):
+		embed.add_field(name = keys[i], value = values[i], inline = False)
+	await ctx.send(embed = embed)
 
 print("run")
 bot.run(TOKEN)
