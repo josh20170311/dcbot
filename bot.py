@@ -24,12 +24,6 @@ async def Test(ctx):
 @bot.command(name = "hi_bot")
 async def hi(ctx):
 	await ctx.send("hi")
-
-@bot.command(name = "bot_exit")
-async def bot_exit(ctx):
-	await ctx.send("exit")
-	print("exit")
-	exit(0)
 	
 @bot.command(name = '確診')
 async def infected(ctx):
