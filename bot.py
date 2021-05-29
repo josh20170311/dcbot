@@ -9,7 +9,13 @@ from bs4 import BeautifulSoup
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-bot = commands.Bot(command_prefix = '!')
+bot = commands.Bot(command_prefix = '/')
+
+client = discord.Client()
+
+@client.event
+async def on_ready():
+    print("on ready")
 
 @bot.command(name = '消毒')
 async def Test(ctx):
@@ -27,5 +33,7 @@ async def infected(ctx):
     for i in range(len(keys)):
         embed.add_field(name = keys[i], value = values[i], inline = False)
     await ctx.send(embed = embed)
-    
+
+print("run")
 bot.run(TOKEN)
+print("finish")
