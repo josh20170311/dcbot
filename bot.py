@@ -9,23 +9,31 @@ from bs4 import BeautifulSoup
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-bot = commands.Bot(command_prefix = '/')
+bot = commands.Bot(command_prefix = '/josh ')
 
-client = discord.Client()
 
-@client.event
+@bot.event
 async def on_ready():
 	print("on ready")
+	
+@bot.command(name = "help_")
+async def help(ctx):
+	text = ""
+	text+=("/josh hi\n")
+	text+=("/josh alchohol\n")
+	text+=("/josh infected\n")
+	await ctx.send(text)
+	
 
-@bot.command(name = '消毒')
+@bot.command(name = 'alcohol')
 async def Test(ctx):
 	await ctx.send('<:disinfection:845207148559335435>')
 
-@bot.command(name = "hi_bot")
+@bot.command(name = "hi")
 async def hi(ctx):
 	await ctx.send("hi")
-	
-@bot.command(name = '確診')
+
+@bot.command(name = 'infected')
 async def infected(ctx):
 	url = 'https://covid19dashboard.cdc.gov.tw/dash3'
 	html = requests.get(url)
@@ -38,6 +46,6 @@ async def infected(ctx):
 		embed.add_field(name = keys[i], value = values[i], inline = False)
 	await ctx.send(embed = embed)
 
-print("run")
+
 bot.run(TOKEN)
 print("finish")
