@@ -27,7 +27,7 @@ async def help(ctx):
 
 @bot.command(name = 'alcohol')
 async def Test(ctx):
-	await ctx.send('<:disinfection:845207148559335435>')
+	await ctx.send('<:alcohol:848182559644188674>')
 
 @bot.command(name = "hi")
 async def hi(ctx):
