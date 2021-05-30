@@ -33,6 +33,23 @@ async def Test(ctx):
 async def hi(ctx):
 	await ctx.send("hi")
 
+@bot.command(name = "news")
+async def News(ctx):
+	url = "https://www.cdc.gov.tw/Bulletin/List/MmgtpeidAR5Ooai4-fgHzQ"
+	html = requests.get(url)
+	sp = BeautifulSoup(html.text, 'html5lib')
+	boxes = sp.find_all(attrs = {"class":"content-boxes-v3"})
+	output = ''
+	site_domain = 'https://www.cdc.gov.tw'
+	for box in boxes:
+		links = box.find_all('a')
+		for link in links :
+			if(link.get('title')):
+				#output += link.get('title') + "\n"
+				output += site_domain + link.get('href') + '\n'
+	await ctx.send(output)
+
+
 @bot.command(name = 'infected')
 async def infected(ctx):
 	url = 'https://covid19dashboard.cdc.gov.tw/dash3'
