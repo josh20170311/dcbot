@@ -1,4 +1,6 @@
 import os
+import asyncio
+import time
 import json
 import discord
 from discord.ext import commands
@@ -9,6 +11,9 @@ from bs4 import BeautifulSoup
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
+
+
+
 bot = commands.Bot(command_prefix = '/josh ')
 
 
@@ -16,15 +21,6 @@ bot = commands.Bot(command_prefix = '/josh ')
 async def on_ready():
 	print("on ready")
 	
-@bot.command(name = "help_")
-async def help(ctx):
-	text = ""
-	text+=("/josh hi\n")
-	text+=("/josh alchohol\n")
-	text+=("/josh infected\n")
-	await ctx.send(text)
-	
-
 @bot.command(name = 'alcohol')
 async def Test(ctx):
 	await ctx.send('<:alcohol:848182559644188674>')
@@ -63,6 +59,6 @@ async def infected(ctx):
 		embed.add_field(name = keys[i], value = values[i], inline = False)
 	await ctx.send(embed = embed)
 
-
 bot.run(TOKEN)
+
 print("finish")
