@@ -4,9 +4,8 @@ import discord
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 import requests
+import sqlite3
 from bs4 import BeautifulSoup
-from apscheduler.schedulers.blocking import BlockingScheduler
-import threading
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -22,17 +21,17 @@ async def on_ready():
 	print("on ready")
 
 
-@bot.command(name='alcohol')
+@bot.command(name='alcohol', help="Use alcohol to disinfect.")
 async def alcohol(ctx):
 	await ctx.send('<:alcohol:848182559644188674>')
 
 
-@bot.command(name="hi")
+@bot.command(name="hi", help="Say hi to coco.")
 async def hi(ctx):
 	await ctx.send("hi")
 
 
-@bot.command(name="news")
+@bot.command(name="news", help="Get news from CDC.")
 async def news(ctx):
 	url = "https://www.cdc.gov.tw/Bulletin/List/MmgtpeidAR5Ooai4-fgHzQ"
 	html = requests.get(url)
@@ -49,7 +48,7 @@ async def news(ctx):
 	await ctx.send(output)
 
 
-@bot.command(name='infected')
+@bot.command(name='infected', help="Get population of infected people in taiwan from CDC.")
 async def infected(ctx):
 	url = 'https://covid19dashboard.cdc.gov.tw/dash3'
 	html = requests.get(url)
@@ -63,18 +62,34 @@ async def infected(ctx):
 	await ctx.send(embed=embed)
 
 
-@bot.command(name='set', help='set location [location]')
+@bot.command(name='set', help='Set location. usage : /coco set [location]')
 async def set_(ctx):
 	args = ctx.message.content.split(' ')
 	author = ctx.message.author
-	print(author)
-	print(type(author))
-	await author.send("ee")
-	print(args)
-	if len(args) < 4:
+	if len(args) < 3:
 		return
-	if args[2] == 'location':
-		print(args[3] + str(author.id))
+	db_name = "./db/users.db"
+	conn = sqlite3.connect(db_name)
+	rows = conn.execute("select count(*) from user where id = {}".format(author.id)).fetchone()
+	location = check(args[2])
+	name = check(author.name)
+
+	if rows[0] == 0:
+		sql_str = "insert into user values({}, '{}', '{}')".format(author.id, name, location)
+		print(sql_str)
+		conn.execute(sql_str)
+	else:
+		sql_str = "update user set name = '{}', location = '{}' where id = {}".format(name, location, author.id)
+		print(sql_str)
+		conn.execute(sql_str)
+	conn.commit()
+	conn.close()
+
+
+def check(value):
+	value = value.replace("\'", " ")
+	value = value.replace("\"", " ")
+	return value
 
 
 @tasks.loop(seconds=20)
