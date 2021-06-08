@@ -87,12 +87,12 @@ async def set_(ctx):
 
 
 def check(value):
-	value = value.replace("\'", " ")
-	value = value.replace("\"", " ")
+	value = value.replace("\'", "\'\'")
+	value = value.replace("\"", "\\\"")
 	return value
 
 
-@tasks.loop(seconds=20)
+@tasks.loop(hours=24)
 async def job():
 	async for g in bot.fetch_guilds():
 		print(g.name)
