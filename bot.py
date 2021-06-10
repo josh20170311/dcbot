@@ -106,8 +106,6 @@ def getLocleNumber():
 	date = date.replace("\t", "")
 	# print(date)
 	boxes = sp.find_all(attrs={"class": "col-lg-12 main"})
-	output = ''
-	site_domain = 'https://www.cdc.gov.tw'
 	links = boxes[1].find_all('a')
 	data = []
 	for link in links:
