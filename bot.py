@@ -92,8 +92,9 @@ async def locale(ctx):
 	conn = sqlite3.connect(DB_NAME)
 	rows = conn.execute("select location from user where id = {}".format(author.id)).fetchone()
 
-	if (rows[0] == None):
-		await ctx.send("location not set")
+	await ctx.send(getLocleNumber())
+	# if (rows[0] == None):
+	# 	await ctx.send("location not set")
 
 
 def getLocleNumber():
