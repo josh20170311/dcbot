@@ -7,6 +7,8 @@ import requests
 import sqlite3
 from bs4 import BeautifulSoup
 
+DB_NAME = "./db/users.db"
+
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
@@ -68,22 +70,54 @@ async def set_(ctx):
 	author = ctx.message.author
 	if len(args) < 3:
 		return
-	db_name = "./db/users.db"
-	conn = sqlite3.connect(db_name)
+	conn = sqlite3.connect(DB_NAME)
 	rows = conn.execute("select count(*) from user where id = {}".format(author.id)).fetchone()
 	location = check(args[2])
 	name = check(author.name)
 
 	if rows[0] == 0:
 		sql_str = "insert into user values({}, '{}', '{}')".format(author.id, name, location)
-		print(sql_str)
-		conn.execute(sql_str)
 	else:
 		sql_str = "update user set name = '{}', location = '{}' where id = {}".format(name, location, author.id)
-		print(sql_str)
-		conn.execute(sql_str)
+	print(sql_str)
+	conn.execute(sql_str)
 	conn.commit()
 	conn.close()
+
+
+@bot.command(name="locale", help="Get number of comfirmed people in locale.")
+async def locale(ctx):
+	author = ctx.message.author
+
+	conn = sqlite3.connect(DB_NAME)
+	rows = conn.execute("select location from user where id = {}".format(author.id)).fetchone()
+
+	if (rows[0] == None):
+		await ctx.send("location not set")
+
+
+def getLocleNumber():
+	url = "https://covid-19.nchc.org.tw/dt_005-covidTable_taiwan.php"
+	html = requests.get(url, verify=False)
+	sp = BeautifulSoup(html.text, 'html5lib')
+	date = sp.find(attrs={"class": "col-lg-4 col-sm-6 text-center my-5"}).text
+	date = date.replace("\n", "")
+	date = date.replace("\t", "")
+	# print(date)
+	boxes = sp.find_all(attrs={"class": "col-lg-12 main"})
+	output = ''
+	site_domain = 'https://www.cdc.gov.tw'
+	links = boxes[1].find_all('a')
+	data = []
+	for link in links:
+		span = link.find("span")
+		text = span.text
+		location, number = text.split(" ")
+		number = number.split("+")
+		number[-1] = "".join(number[-1].split())  # 去除\xa0
+		# print(location, number)
+		data.append([location, number])
+	return [date, data]
 
 
 def check(value):
