@@ -85,19 +85,21 @@ async def set_(ctx):
 	conn.close()
 
 
-@bot.command(name="locale", help="Get number of comfirmed people in locale.")
+@bot.command(name="locale", help="Get number of confirmed people in locale.")
 async def locale(ctx):
-	author = ctx.message.author
+	return_str = ""
+	date, data = get_locale_infected()
+	return_str += "更新日期: {} \n".format(date)
+	for location, number in data:
+		total = number[0]
+		new_cases = 0
+		if len(number) > 1:
+			new_cases = number[1]
+		return_str += "{}: 累積確診人數:{},\t本日新增人數: {}\n".format(location, total, new_cases)
+	await ctx.send(return_str)
 
-	conn = sqlite3.connect(DB_NAME)
-	rows = conn.execute("select location from user where id = {}".format(author.id)).fetchone()
 
-	await ctx.send(getLocleNumber())
-	# if (rows[0] == None):
-	# 	await ctx.send("location not set")
-
-
-def getLocleNumber():
+def get_locale_infected():
 	url = "https://covid-19.nchc.org.tw/dt_005-covidTable_taiwan.php"
 	html = requests.get(url, verify=False)
 	sp = BeautifulSoup(html.text, 'html5lib')
@@ -111,11 +113,11 @@ def getLocleNumber():
 	for link in links:
 		span = link.find("span")
 		text = span.text
-		location, number = text.split(" ")
-		number = number.split("+")
-		number[-1] = "".join(number[-1].split())  # 去除\xa0
-		# print(location, number)
-		data.append([location, number])
+		location, numbers = text.split(" ")
+		numbers = numbers.split("+")
+		numbers[-1] = "".join(numbers[-1].split())  # 去除\xa0
+		# print(location, numbers)
+		data.append([location, numbers])
 	return [date, data]
 
 
@@ -127,6 +129,20 @@ def check(value):
 
 @tasks.loop(hours=24)
 async def job():
+	date, data = get_locale_infected()
+	conn = sqlite3.connect(DB_NAME)
+	for location, numbers in data:
+		if len(numbers) == 1:
+			continue
+		if int(numbers[1]) > 0:
+			rows = conn.execute("select * from user where location = '{}'".format(location))
+			for row in rows:
+				user = await bot.fetch_user(int(row[0]))
+				await user.send("更新日期:{} {} 新增確診:{}例".format(date, location, numbers[1]))
+
+	conn.commit()
+	conn.close()
+
 	async for g in bot.fetch_guilds():
 		print(g.name)
 		async for m in g.fetch_members():
