@@ -104,13 +104,26 @@ async def locale(ctx):
 			new_cases = number[1]
 		if is_specific:
 			if location == arg_location:
-				return_str += "{}:{:>4d}\t/{:>4d}\n".format(location, int(new_cases), int(total))
+				return_str += "{}：{:>4d}\t/{:>4d}\n".format(location, int(new_cases), int(total))
 				break
 			else:
 				continue
-		return_str += "{}:{:>4d}\t/{:>4d}\n".format(location, int(new_cases), int(total))
+		return_str += "{}：{:>4d}\t/{:>4d}\n".format(location, int(new_cases), int(total))
 	await ctx.send(return_str)
 
+@bot.command(name="db")
+async def db(ctx):
+	conn = sqlite3.connect(DB_NAME)
+	return_str = ""
+	rows = conn.execute("select * from user")
+	for row in rows:
+		return_str += "{}|{}|{}\n".format(row[0],row[1],row[2])
+	conn.close()
+	await ctx.send(return_str)
+
+@bot.command(name="no")
+async def no(ctx):
+	await ctx.send(r"https://i1.read01.com/SIG=37fu2tn/304e6b66724647674a39.jpg")
 
 def get_locale_infected():
 	url = "https://covid-19.nchc.org.tw/dt_005-covidTable_taiwan.php"
