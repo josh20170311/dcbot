@@ -127,9 +127,13 @@ def check(value):
 	return value
 
 
-@tasks.loop(hours=24)
+lastdate = ""
+@tasks.loop(minutes=5)
 async def job():
 	date, data = get_locale_infected()
+	if date == lastdate:
+		return
+	lastdate = date
 	conn = sqlite3.connect(DB_NAME)
 	for location, numbers in data:
 		if len(numbers) == 1:
