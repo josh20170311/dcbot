@@ -147,11 +147,11 @@ async def job():
 	conn.commit()
 	conn.close()
 
-	async for g in bot.fetch_guilds():
-		print(g.name)
-		async for m in g.fetch_members():
-			if not m.bot:
-				print("{}\t{}".format(m.name, m.id))
+	# async for g in bot.fetch_guilds():
+	# 	print(g.name)
+	# 	async for m in g.fetch_members():
+	# 		if not m.bot:
+	# 			print("{}\t{}".format(m.name, m.id))
 
 
 job.start()
