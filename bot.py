@@ -85,17 +85,30 @@ async def set_(ctx):
 	conn.close()
 
 
-@bot.command(name="locale", help="Get number of confirmed people in locale.")
+@bot.command(name="locale", help="Get number of confirmed people in locale. usage : /coco locale OR /coco locale [location]")
 async def locale(ctx):
 	return_str = ""
+	args = ctx.message.content.split(' ')
 	date, data = get_locale_infected()
 	return_str += "更新日期: {} \n".format(date)
+	return_str += "\n\t\t\t\t（本日新增人數／累積確診人數）\n"
+	is_specific = False
+	if len(args) > 2:
+		arg_location = args[2]
+		is_specific = True
+
 	for location, number in data:
 		total = number[0]
 		new_cases = 0
 		if len(number) > 1:
 			new_cases = number[1]
-		return_str += "{}: 累積確診人數:{},\t本日新增人數: {}\n".format(location, total, new_cases)
+		if is_specific:
+			if location == arg_location:
+				return_str += "{}:{:>4d}\t/{:>4d}\n".format(location, int(new_cases), int(total))
+				break
+			else:
+				continue
+		return_str += "{}:{:>4d}\t/{:>4d}\n".format(location, int(new_cases), int(total))
 	await ctx.send(return_str)
 
 
